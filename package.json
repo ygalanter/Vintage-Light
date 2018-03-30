@@ -1,0 +1,21 @@
+{
+  "fitbit": {
+    "appUUID": "d0b669eb-459f-467e-aae0-f7833b7472a9",
+    "appType": "clockface",
+    "appDisplayName": "Vintage Light",
+    "iconFile": "resources/icon.png",
+    "wipeColor": "#607d8b",
+    "requestedPermissions": [
+      "access_activity"
+    ],
+    "buildTargets": [
+      "meson",
+      "higgs"
+    ],
+    "i18n": {
+      "en": {
+        "name": "Vintage Light"
+      }
+    }
+  }
+}
