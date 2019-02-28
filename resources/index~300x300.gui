@@ -8,6 +8,13 @@
       x='0' y='0' width='100%' height='100%' data-size='16'/>
   </defs>
   
+ <gradientRect x="0" y="0" width="100%" height="100%"
+    gradient-type="radial"
+    gradient-x1="50%" gradient-y1="50%"
+    gradient-x2="100%" gradient-y2="100%"
+    gradient-color1="#336587"
+    gradient-color2="#1A2935" />
+  
   <image href="back.png" x="0" y="0" width="100%" height="100%" />
   
   <image id="complication1" width="90" height="90" x="22" y="105" href="complication.png"/>
@@ -62,21 +69,22 @@
               <rect x="3" y="-80" width="5" height="112" fill="#D6D5D4" />            
           </g>
 
-          <g id="second-hand">
+        </g>
+
+      </use>
+  
+      <g id="second-hand" transform='translate(50%,50%)'>
              <line x1="-3" y1="-130" x2="-5" y2="50" fill="black" opacity="0.3" stroke-width="4" /> 
              <line x1="-3" y1="-130" x2="-1" y2="50" fill="black" opacity="0.3"  stroke-width="4" /> 
             
              <line x1="0" y1="-130" x2="-2" y2="50" fill="#E24534" stroke-width="4" /> 
              <line x1="0" y1="-130" x2="2" y2="50" fill="#E24534" stroke-width="4" /> 
-          </g>      
-          
-          <circle cx="0" cy="0" r="9" fill="darkred"/>
-          <circle cx="0" cy="0" r="8" fill="#E24534"/>
-          <circle cx="0" cy="0" r="2" fill="black"/>
+        
+            <circle cx="0" cy="0" r="9" fill="darkred"/>
+            <circle cx="0" cy="0" r="8" fill="#E24534"/>
+            <circle cx="0" cy="0" r="2" fill="black"/>
+      </g>   
 
-        </g>
-
-      </use>
 
 
 

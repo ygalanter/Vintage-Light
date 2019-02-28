@@ -1,14 +1,11 @@
 // importing libraries
 import clock from "clock";
 import document from "document";
-import { preferences } from "user-settings";
 import { battery } from "power";
-import { me as device } from "device";
-import * as messaging from "messaging";
-import * as fs from "fs";
-import { me } from "appbit";
 import { goals, today } from "user-activity";
-import dtlib from "../common/datetimelib"
+import dtlib from "../common/datetimelib";
+import { preferences } from "fitbit-preferences";
+import asap from "fitbit-asap/app";
 
 //getting UI elements
 const doc = {
@@ -35,59 +32,56 @@ const doc = {
   datelbl: document.getElementById("date")
 }
 
+const second_hand = document.getElementById("second-hand");
 
-// on app exit collect settings 
-me.onunload = () => {
-  fs.writeFileSync("user_settings.json", userSettings, "json");
+// *** Begin Sweeeping animation of second hand
+
+let callback = (timestamp) => {
+  second_hand.groupTransform.rotate.angle = timestamp % 60000 * 3 / 500;
+  requestAnimationFrame(callback);
 }
+requestAnimationFrame(callback);
+// *** End Sweeeping animation of second hand
 
-
+requestAnimationFrame(callback);
+// *** End Sweeeping animation of second hand
 // Message is received
-messaging.peerSocket.onmessage = evt => {
+asap.onmessage = data => {
   
-  switch (evt.data.key) {
+  switch (data.key) {
      case "complication1":
      case "complication2":
-          userSettings[evt.data.key] = JSON.parse(evt.data.newValue).values[0].value;
-          setActivityIcon(evt.data.key);
-          updateActivity(evt.data.key);
+          let newActivity = JSON.parse(data.newValue).values[0].value
+
+          // skip unsupported activities, e.g. elevationGain on VL GM
+          if (newActivity !== "battery" && today.adjusted[newActivity] === undefined) {
+            return
+          }
+
+          preferences[data.key] = newActivity;
+          setActivityIcon(data.key);
+          updateActivity(data.key);
           break;
   };
 }
 
-// Message socket opens
-messaging.peerSocket.onopen = () => {
-  console.log("App Socket Open");
-};
-
-// Message socket closes
-messaging.peerSocket.close = () => {
-  console.log("App Socket Closed");
-};
 
 
 
 // trying to get user settings if saved before
-let userSettings;
-try {
-  userSettings = fs.readFileSync("user_settings.json", "json");
-} catch (e) {
-  userSettings = {complication1: "steps", complication2: "battery"}
+if (!preferences.complication1) {
+  preferences.complication1 = "steps";
+  preferences.complication2 = "battery";
 }
 
-
-//trap
-if (!userSettings.compication1) {
-  userSettings = {complication1: "steps", complication2: "battery"}
-}
 
 function setActivityIcon(complication) {
-  doc.complication_icon[complication].href = `icons/${userSettings[complication]}.png`;
+  doc.complication_icon[complication].href = `icons/${preferences[complication]}.png`;
 }
 
 
 function updateActivity(complication) {
-  let activity = userSettings[complication];
+  let activity = preferences[complication];
   let max, current
   
   if (activity == 'battery') {
@@ -95,7 +89,7 @@ function updateActivity(complication) {
     current = battery.chargeLevel;
   } else {
     max = goals[activity];
-    current = today.local[activity];
+    current = today.adjusted[activity];
   }
   
   if (current >= max) {
@@ -107,11 +101,7 @@ function updateActivity(complication) {
     doc.complication_circle[complication].style.fill = "black";
   }
   let angle = 2*Math.PI*current/max - Math.PI/2;
-  
-  // console.log(activity);
-  // console.log(current);
-  // console.log(max);
-  
+
   doc.complication_dial_back[complication].x1 = doc.complication_dial_center[complication].x + 
     doc.complication_dial_center[complication].r*Math.cos(angle);
   doc.complication_dial_back[complication].y1 = doc.complication_dial_center[complication].y + 
@@ -129,7 +119,7 @@ setActivityIcon("complication2");
 
 
 // Update the clock every minute
-clock.granularity = "minutes";
+clock.granularity = "seconds";
 
 // Update the clock every tick event
 clock.ontick = (evt) => {
