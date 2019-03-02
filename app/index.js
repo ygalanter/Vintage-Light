@@ -54,8 +54,8 @@ asap.onmessage = data => {
           let newActivity = JSON.parse(data.newValue).values[0].value
 
           // skip unsupported activities, e.g. elevationGain on VL GM
-          if (newActivity !== "battery" && today.adjusted[newActivity] === undefined) {
-            return
+          if (newActivity !== "battery" && today.local[newActivity] === undefined) {
+            break
           }
 
           preferences[data.key] = newActivity;
